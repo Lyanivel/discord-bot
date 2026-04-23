@@ -53,9 +53,9 @@ async function sendDateAlert() {
 
 const embed = new EmbedBuilder()
   .setColor("#ff2ea6")
-  .setTitle("✨ 𝐆𝐎𝐎𝐒 𝐃𝐀𝐓𝐄! 🖤✨")
   .setDescription(
-    "‎\n" + // 👈 invisible character + newline (creates a gap)
+    "‎\n‎\n" + // 👈 space from top of embed
+    "✨ 𝐆𝐎𝐎𝐒 𝐃𝐀𝐓𝐄! 🖤✨\n\n" +
     "**ᴛʏᴘᴇ ?ᴅᴀᴛᴇ ᴛᴏ ᴄʟᴀɪᴍ ʏᴏᴜʀ ɢᴏᴏs ᴡɪᴛʜɪɴ 1 ᴍɪɴᴜᴛᴇ!** <:PinkGoos:1496723632288694314>"
   )
   .setFooter({ text: "Test" });
