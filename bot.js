@@ -12,7 +12,6 @@ const CHANNEL_ID = "1295247108001103974";
 const ROLE_ID = "1301948099958280303";
 
 const SCHEDULE = ["21:25"];
-];
 
 let sent = new Set();
 
