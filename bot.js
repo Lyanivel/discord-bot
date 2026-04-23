@@ -19,42 +19,67 @@ const SCHEDULE = [
   "22:02","22:22","23:03","23:33"
 ];
 
-let sent = new Set();
+function getESTNow() {
+  return new Date(
+    new Date().toLocaleString("en-US", { timeZone: "America/New_York" })
+  );
+}
+
+function getNextScheduledTime() {
+  const now = getESTNow();
+
+  for (let i = 0; i < 2; i++) {
+    const checkDate = new Date(now);
+    checkDate.setDate(now.getDate() + i);
+
+    for (const time of SCHEDULE) {
+      const [hour, minute] = time.split(":").map(Number);
+
+      const target = new Date(checkDate);
+      target.setHours(hour, minute, 0, 0);
+
+      if (target > now) {
+        return target;
+      }
+    }
+  }
+
+  return null;
+}
+
+async function scheduleNextMessage() {
+  const nextTime = getNextScheduledTime();
+
+  if (!nextTime) {
+    console.log("No next scheduled time found.");
+    setTimeout(scheduleNextMessage, 60000);
+    return;
+  }
+
+  const now = getESTNow();
+  const delay = nextTime.getTime() - now.getTime();
+
+  console.log("Next send scheduled for:", nextTime.toLocaleString("en-US"));
+
+  setTimeout(async () => {
+    try {
+      const channel = await client.channels.fetch(CHANNEL_ID);
+
+      if (channel) {
+        await channel.send(`<@&${ROLE_ID}> Time to run ?date!`);
+        console.log("Sent at:", getESTNow().toLocaleString("en-US"));
+      }
+    } catch (err) {
+      console.error("Send error:", err);
+    }
+
+    scheduleNextMessage();
+  }, delay);
+}
 
 client.once("ready", () => {
   console.log("BOT CONNECTED");
-
-  setInterval(async () => {
-    try {
-      const now = new Date();
-
-      const est = new Date(
-        now.toLocaleString("en-US", { timeZone: "America/New_York" })
-      );
-
-      const hours = String(est.getHours()).padStart(2, "0");
-      const minutes = String(est.getMinutes()).padStart(2, "0");
-      const estTime = `${hours}:${minutes}`;
-
-      console.log("Time:", estTime);
-
-      if (SCHEDULE.includes(estTime) && !sent.has(estTime)) {
-        const channel = await client.channels.fetch(CHANNEL_ID);
-
-        if (channel) {
-          await channel.send(`<@&${ROLE_ID}> Time to run ?date!`);
-          console.log("Sent at", estTime);
-          sent.add(estTime);
-        }
-      }
-
-      if (estTime === "00:00") {
-        sent.clear();
-      }
-    } catch (err) {
-      console.error("ERROR:", err);
-    }
-  }, 00000);
+  scheduleNextMessage();
 });
 
 client.login(TOKEN);
