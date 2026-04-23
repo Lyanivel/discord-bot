@@ -12,7 +12,7 @@ const CHANNEL_ID = "1295247108001103974";
 const ROLE_ID = "1301948099958280303";
 
 const SCHEDULE = [
-  "00:04","00:25","00:44","01:05","01:55","02:06","03:07","04:08","05:09",
+  "00:04","00:44","01:05","01:55","02:06","03:07","04:08","05:09",
   "06:10","07:11","08:12","08:21","09:13","09:31","09:37","10:14",
   "10:41","11:15","12:16","13:17","14:18","15:19","16:02","16:20",
   "17:12","17:21","18:22","19:23","19:32","20:00","21:01","21:11",
@@ -69,13 +69,17 @@ async function scheduleNextMessage() {
  const { EmbedBuilder } = require("discord.js");
 
 const embed = new EmbedBuilder()
-  .setColor("#9e659d")
-  .setTitle("# ✨ 𝐆𝐎𝐎𝐒 𝐃𝐀𝐓𝐄! 🖤")
-  
+  .setColor("#ff2ea6")
+  .setTitle("✨ GOOS DATE! 🖤")
+
   .setDescription(
-    "### ᴛʏᴘᴇ ?ᴅᴀᴛᴇ ᴛᴏ ᴄʟᴀɪᴍ ʏᴏᴜʀ ɢᴏᴏs ᴡɪᴛʜɪɴ 1 ᴍɪɴᴜᴛᴇ!*<:PinkGoos:1467915645407592488>"
+    "**TYPE `?DATE` TO CLAIM YOUR GOOS WITHIN 1 MINUTE!** <:YOUR_EMOJI_NAME:YOUR_EMOJI_ID>"
+
+    "🖤 **@Test**"
   )
-.setFooter({ text: "@Test 🤑" })
+  .setFooter({
+    text: "@Goos Date 🤑"
+  });
 
 await channel.send({
   content: `<@&${ROLE_ID}>`,
