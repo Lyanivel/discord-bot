@@ -197,12 +197,12 @@ client.on("interactionCreate", async interaction => {
   if (interaction.commandName === "nextdate") {
     const nextTime = getNextScheduledTime();
 
-    await interaction.reply({
-      content: nextTime
-        ? `Next Goos Date is **${nextTime.toLocaleString("en-US")}**`
-        : "No next date found.",
-      ephemeral: false
-    });
+await interaction.reply({
+  content: nextTime
+    ? `Next Goos Date is <t:${Math.floor(nextTime.getTime() / 1000)}:t> (<t:${Math.floor(nextTime.getTime() / 1000)}:R>)`
+    : "No next date found.",
+  ephemeral: false
+});
   }
 });
 
