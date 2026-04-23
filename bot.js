@@ -56,15 +56,17 @@ function getNextScheduledTime() {
 
   return null;
 }
+
 function buildDateEmbed() {
   return new EmbedBuilder()
     .setColor("#ff2ea6")
-    .setTitle("✨🖤 𝐆𝐎𝐎𝐒 𝐃𝐀𝐓𝐄! 🖤✨") // 👈 BIG text restored
+    .setTitle("✨🖤 𝐆𝐎𝐎𝐒 𝐃𝐀𝐓𝐄! 🖤✨")
     .setDescription(
       "**ᴛʏᴘᴇ ?ᴅᴀᴛᴇ ᴛᴏ ᴄʟᴀɪᴍ ʏᴏᴜʀ ɢᴏᴏs ᴡɪᴛʜɪɴ 1 ᴍɪɴᴜᴛᴇ!** <:PinkGoos:1496723632288694314>\n\n\n"
     )
     .setFooter({ text: "ᴄʜᴇᴄᴋ ɴᴇxᴛ ᴅᴀᴛᴇ ᴡɪᴛʜ '/ɴᴇxᴛᴅᴀᴛᴇ'" });
 }
+
 async function sendDateAlert() {
   const channel = await client.channels.fetch(CHANNEL_ID);
   const embed = buildDateEmbed();
@@ -197,12 +199,28 @@ client.on("interactionCreate", async interaction => {
   if (interaction.commandName === "nextdate") {
     const nextTime = getNextScheduledTime();
 
-await interaction.reply({
-  content: nextTime
-    ? `Next Goos Date is <t:${Math.floor(nextTime.getTime() / 1000)}:t> (<t:${Math.floor(nextTime.getTime() / 1000)}:R>)`
-    : "No next date found.",
-  ephemeral: false
-});
+    if (!nextTime) {
+      await interaction.reply({
+        content: "No next date found.",
+        ephemeral: false
+      });
+      return;
+    }
+
+    const now = getESTNow();
+    let safeTime = nextTime;
+
+    if (safeTime.getTime() <= now.getTime()) {
+      safeTime = new Date(safeTime.getTime() + 24 * 60 * 60 * 1000);
+    }
+
+    const unix = Math.floor(safeTime.getTime() / 1000);
+
+    await interaction.reply({
+      content: `Next Goos Date is <t:${unix}:t> (<t:${unix}:R>)`,
+      ephemeral: false
+    });
+    return;
   }
 });
 
