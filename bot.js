@@ -66,8 +66,20 @@ async function scheduleNextMessage() {
       const channel = await client.channels.fetch(CHANNEL_ID);
 
       if (channel) {
-        await channel.send(`<@&${ROLE_ID}> Time to run ?date!`);
-        console.log("Sent at:", getESTNow().toLocaleString("en-US"));
+ const { EmbedBuilder } = require("discord.js");
+
+const embed = new EmbedBuilder()
+  .setColor("#9e659d")
+  .setTitle("✨ 𝐆𝐎𝐎𝐒 𝐃𝐀𝐓𝐄! 🖤")
+  .setDescription(
+    "**ᴛʏᴘᴇ ?ᴅᴀᴛᴇ ᴛᴏ ᴄʟᴀɪᴍ ʏᴏᴜʀ ɢᴏᴏs ᴡɪᴛʜɪɴ 1 ᴍɪɴᴜᴛᴇ!**<:PinkGoos:1467915645407592488>"
+  )
+.setFooter({ text: "@Goos Date 🤑" })
+
+await channel.send({
+  content: `<@&${ROLE_ID}>`,
+  embeds: [embed]
+});
       }
     } catch (err) {
       console.error("Send error:", err);
