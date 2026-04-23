@@ -71,10 +71,11 @@ async function scheduleNextMessage() {
 const embed = new EmbedBuilder()
   .setColor("#9e659d")
   .setTitle("✨ 𝐆𝐎𝐎𝐒 𝐃𝐀𝐓𝐄! 🖤")
+  
   .setDescription(
-    "**ᴛʏᴘᴇ ?ᴅᴀᴛᴇ ᴛᴏ ᴄʟᴀɪᴍ ʏᴏᴜʀ ɢᴏᴏs ᴡɪᴛʜɪɴ 1 ᴍɪɴᴜᴛᴇ!**<:PinkGoos:1467915645407592488>"
+    "*ᴛʏᴘᴇ ?ᴅᴀᴛᴇ ᴛᴏ ᴄʟᴀɪᴍ ʏᴏᴜʀ ɢᴏᴏs ᴡɪᴛʜɪɴ 1 ᴍɪɴᴜᴛᴇ!*<:PinkGoos:1467915645407592488>"
   )
-.setFooter({ text: "@Goos Date 🤑" })
+.setFooter({ text: "@Test 🤑" })
 
 await channel.send({
   content: `<@&${ROLE_ID}>`,
