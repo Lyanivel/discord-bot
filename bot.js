@@ -7,7 +7,8 @@ const client = new Client({
   ]
 });
 
-const TOKEN = "MTQ5NjU4OTQ3MTg2MzQwNjcyMg.GKfGDp.MBH0-aPzL62_6ahLvk0V7xFSeTusYHjtCbEuyc";
+
+const TOKEN = process.env.TOKEN;
 
 const CHANNEL_ID = "1295247108001103974";
 const ROLE_ID = "1301948099958280303";
@@ -23,11 +24,12 @@ const SCHEDULE = [
 let sent = new Set();
 
 client.once("ready", () => {
-  console.log("BOT ONLINE");
+  console.log("✅ BOT CONNECTED TO DISCORD");
+  console.log("Logged in as:", client.user.tag);
+});
 
   setInterval(async () => {
     const now = new Date();
-
 
     const est = new Date(
       now.toLocaleString("en-US", { timeZone: "America/New_York" })
@@ -46,19 +48,22 @@ client.once("ready", () => {
 
         await channel.send(`<@&${ROLE_ID}> Time to run ?date!`);
 
-        console.log("✅ Sent at:", estTime);
+        console.log("Sent at:", estTime);
 
         sent.add(estTime);
       } catch (err) {
-        console.error("❌ Send error:", err);
+        console.error("Send error:", err);
       }
     }
 
+    // reset at midnight
     if (estTime === "00:00") {
       sent.clear();
     }
 
-  }, 30000); // checks every 30 seconds
+  }, 30000);
 });
 
 client.login(TOKEN);
+client.on("error", console.error);
+process.on("unhandledRejection", console.error);
