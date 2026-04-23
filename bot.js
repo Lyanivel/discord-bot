@@ -61,7 +61,7 @@ async function sendDateAlert() {
     .setFooter({ text: "Test" });
 
   await channel.send({
-    content: `<@&${ROLE_ID}>`,
+    content: `<@&${ROLE_ID}>\n`,
     embeds: [embed],
     allowedMentions: { parse: ["roles"] }
   });
