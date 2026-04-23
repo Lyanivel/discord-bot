@@ -59,6 +59,7 @@ function getNextScheduledTime() {
 function buildDateEmbed() {
   return new EmbedBuilder()
     .setColor("#ff2ea6")
+    "‎\n" +
     .setTitle("✨🖤 𝐆𝐎𝐎𝐒 𝐃𝐀𝐓𝐄! 🖤✨") // 👈 BIG text restored
     .setDescription(
       "‎\n" + // 👈 invisible spacer (adds gap under title)
