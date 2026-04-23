@@ -56,17 +56,17 @@ function getNextScheduledTime() {
 
   return null;
 }
-
 function buildDateEmbed() {
   return new EmbedBuilder()
     .setColor("#ff2ea6")
+    .setTitle("✨🖤 𝐆𝐎𝐎𝐒 𝐃𝐀𝐓𝐄! 🖤✨") // 👈 BIG text restored
     .setDescription(
-      "**✨🖤 𝐆𝐎𝐎𝐒 𝐃𝐀𝐓𝐄! 🖤✨**\n\n" +
+      "‎\n" + // 👈 invisible spacer (adds gap under title)
+
       "**ᴛʏᴘᴇ ?ᴅᴀᴛᴇ ᴛᴏ ᴄʟᴀɪᴍ ʏᴏᴜʀ ɢᴏᴏs ᴡɪᴛʜɪɴ 1 ᴍɪɴᴜᴛᴇ!** <:PinkGoos:1496723632288694314>\n\n\n\n"
     )
     .setFooter({ text: "ᴄʜᴇᴄᴋ ɴᴇxᴛ ᴅᴀᴛᴇ ᴡɪᴛʜ '/ɴᴇxᴛᴅᴀᴛᴇ'" });
 }
-
 async function sendDateAlert() {
   const channel = await client.channels.fetch(CHANNEL_ID);
   const embed = buildDateEmbed();
