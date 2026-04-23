@@ -61,7 +61,6 @@ function buildDateEmbed() {
     .setColor("#ff2ea6")
     .setTitle("✨🖤 𝐆𝐎𝐎𝐒 𝐃𝐀𝐓𝐄! 🖤✨") // 👈 BIG text restored
     .setDescription(
-      "‎\n" + // 👈 invisible spacer (adds gap under title)
       "**ᴛʏᴘᴇ ?ᴅᴀᴛᴇ ᴛᴏ ᴄʟᴀɪᴍ ʏᴏᴜʀ ɢᴏᴏs ᴡɪᴛʜɪɴ 1 ᴍɪɴᴜᴛᴇ!** <:PinkGoos:1496723632288694314>\n\n\n\n"
     )
     .setFooter({ text: "ᴄʜᴇᴄᴋ ɴᴇxᴛ ᴅᴀᴛᴇ ᴡɪᴛʜ '/ɴᴇxᴛᴅᴀᴛᴇ'" });
