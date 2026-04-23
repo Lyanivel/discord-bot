@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits } = require("discord.js");
+const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
 
 const client = new Client({
   intents: [
@@ -11,6 +11,7 @@ const TOKEN = process.env.TOKEN;
 const CHANNEL_ID = "1295247108001103974";
 const ROLE_ID = "1301948099958280303";
 
+// Replace this with your full Ghosty schedule after testing
 const SCHEDULE = [
   "00:04","00:44","01:05","01:55","02:06","03:07","04:08","05:09",
   "06:10","07:11","08:12","08:21","09:13","09:31","09:37","10:14",
@@ -28,14 +29,14 @@ function getESTNow() {
 function getNextScheduledTime() {
   const now = getESTNow();
 
-  for (let i = 0; i < 2; i++) {
-    const checkDate = new Date(now);
-    checkDate.setDate(now.getDate() + i);
+  for (let dayOffset = 0; dayOffset < 2; dayOffset++) {
+    const baseDate = new Date(now);
+    baseDate.setDate(now.getDate() + dayOffset);
 
     for (const time of SCHEDULE) {
       const [hour, minute] = time.split(":").map(Number);
 
-      const target = new Date(checkDate);
+      const target = new Date(baseDate);
       target.setHours(hour, minute, 0, 0);
 
       if (target > now) {
@@ -45,6 +46,22 @@ function getNextScheduledTime() {
   }
 
   return null;
+}
+
+async function sendDateAlert() {
+  const channel = await client.channels.fetch(CHANNEL_ID);
+
+  const embed = new EmbedBuilder()
+    .setColor("#ff2ea6")
+    .setTitle("✨ GOOS DATE! 🖤")
+    .setDescription("**TYPE `?DATE` TO CLAIM YOUR GOOS WITHIN 1 MINUTE! 👻**")
+    .setFooter({ text: "@Goos Date 🤑" });
+
+  await channel.send({
+    content: `<@&${ROLE_ID}>`,
+    embeds: [embed],
+    allowedMentions: { parse: ["roles"] }
+  });
 }
 
 async function scheduleNextMessage() {
@@ -59,35 +76,15 @@ async function scheduleNextMessage() {
   const now = getESTNow();
   const delay = nextTime.getTime() - now.getTime();
 
+  console.log("BOT CONNECTED");
   console.log("Next send scheduled for:", nextTime.toLocaleString("en-US"));
 
   setTimeout(async () => {
     try {
-      const channel = await client.channels.fetch(CHANNEL_ID);
-
-      if (channel) {
- const { EmbedBuilder } = require("discord.js");
-
-const embed = new EmbedBuilder()
-  .setColor("#ff2ea6")
-  .setTitle("✨ GOOS DATE! 🖤")
-
-  .setDescription(
-    "**TYPE `?DATE` TO CLAIM YOUR GOOS WITHIN 1 MINUTE!**"
-
-    "🖤 **@Test**"
-  )
-  .setFooter({
-    text: "@Goos Date 🤑"
-  });
-
-await channel.send({
-  content: `<@&${ROLE_ID}>`,
-  embeds: [embed]
-});
-      }
+      await sendDateAlert();
+      console.log("Sent at:", getESTNow().toLocaleString("en-US"));
     } catch (err) {
-      console.error("Send error:", err);
+      console.error("SEND ERROR:", err);
     }
 
     scheduleNextMessage();
@@ -95,8 +92,11 @@ await channel.send({
 }
 
 client.once("ready", () => {
-  console.log("BOT CONNECTED");
+  console.log("Logged in as:", client.user.tag);
   scheduleNextMessage();
 });
+
+client.on("error", console.error);
+process.on("unhandledRejection", console.error);
 
 client.login(TOKEN);
