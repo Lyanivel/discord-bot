@@ -73,7 +73,7 @@ const embed = new EmbedBuilder()
   .setTitle("✨ GOOS DATE! 🖤")
 
   .setDescription(
-    "**TYPE `?DATE` TO CLAIM YOUR GOOS WITHIN 1 MINUTE!** <:PinkGoos:1496723632288694314>"
+    "**TYPE `?DATE` TO CLAIM YOUR GOOS WITHIN 1 MINUTE!**"
 
     "🖤 **@Test**"
   )
