@@ -20,6 +20,7 @@ const GUILD_ID = process.env.GUILD_ID;
 
 const CHANNEL_ID = "1295247108001103974";
 const ROLE_ID = "1301948099958280303";
+const STAFF_ROLE_ID = "1240660412647866378";
 const TIME_ZONE = "America/New_York";
 
 const SCHEDULE = [
@@ -29,6 +30,9 @@ const SCHEDULE = [
   "17:12","17:21","18:22","19:23","19:32","20:00","21:01","21:11",
   "22:02","22:22","23:03","23:33"
 ];
+function hasStaffRole(interaction) {
+  return interaction.member.roles.cache.has(STAFF_ROLE_ID);
+}
 
 function getZonedParts(date, timeZone = TIME_ZONE) {
   const formatter = new Intl.DateTimeFormat("en-US", {
@@ -222,6 +226,13 @@ client.on("interactionCreate", async interaction => {
   if (!interaction.isChatInputCommand()) return;
 
   if (interaction.commandName === "status") {
+        if (!hasStaffRole(interaction)) {
+      await interaction.reply({
+        content: "Only Staff can use this command.",
+        ephemeral: true
+      });
+      return;
+    }
     const nextTime = getNextScheduledTime();
     const unix = nextTime ? Math.floor(nextTime.getTime() / 1000) : null;
 
@@ -247,6 +258,13 @@ client.on("interactionCreate", async interaction => {
   }
 
   if (interaction.commandName === "testping") {
+        if (!hasStaffRole(interaction)) {
+      await interaction.reply({
+        content: "Only Staff can use this command.",
+        ephemeral: true
+      });
+      return;
+    }
     try {
       await sendDateAlert();
       await interaction.reply({
@@ -264,6 +282,7 @@ client.on("interactionCreate", async interaction => {
   }
 
   if (interaction.commandName === "nextdate") {
+    }
     const nextTime = getNextScheduledTime();
 
     if (!nextTime) {
