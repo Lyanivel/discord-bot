@@ -30,8 +30,13 @@ const SCHEDULE = [
   "17:12","17:21","18:22","19:23","19:32","20:00","21:01","21:11",
   "22:02","22:22","23:03","23:33"
 ];
+
 function hasStaffRole(interaction) {
-  return interaction.member.roles.cache.has(STAFF_ROLE_ID);
+  try {
+    return interaction.member.roles.cache.has(STAFF_ROLE_ID);
+  } catch {
+    return false;
+  }
 }
 
 function getZonedParts(date, timeZone = TIME_ZONE) {
@@ -92,15 +97,11 @@ function zonedTimeToUtc(year, month, day, hour, minute, second = 0, timeZone = T
   return new Date(utcGuess);
 }
 
-function getCurrentEasternDateTime() {
-  return getZonedParts(new Date(), TIME_ZONE);
-}
-
 function getNextScheduledTime() {
   const now = new Date();
 
   for (let dayOffset = 0; dayOffset < 3; dayOffset++) {
-    const probe = new Date(now.getTime() + dayOffset * 24 * 60 * 60 * 1000);
+    const probe = new Date(now.getTime() + dayOffset * 86400000);
     const easternDay = getZonedParts(probe, TIME_ZONE);
 
     for (const time of SCHEDULE) {
@@ -111,14 +112,10 @@ function getNextScheduledTime() {
         easternDay.month,
         easternDay.day,
         hour,
-        minute,
-        0,
-        TIME_ZONE
+        minute
       );
 
-      if (candidate.getTime() > now.getTime()) {
-        return candidate;
-      }
+      if (candidate > now) return candidate;
     }
   }
 
@@ -146,79 +143,33 @@ async function sendDateAlert() {
   });
 }
 
-let nextTimer = null;
-
-function clearExistingTimer() {
-  if (nextTimer) {
-    clearTimeout(nextTimer);
-    nextTimer = null;
-  }
-}
-
 function scheduleNextMessage() {
-  clearExistingTimer();
-
   const nextTime = getNextScheduledTime();
 
-  if (!nextTime) {
-    console.log("No next scheduled time found.");
-    nextTimer = setTimeout(scheduleNextMessage, 60000);
-    return;
-  }
+  if (!nextTime) return setTimeout(scheduleNextMessage, 60000);
 
-  const easternNow = getCurrentEasternDateTime();
   const delay = nextTime.getTime() - Date.now();
 
-  console.log(
-    `Current Eastern: ${String(easternNow.hour).padStart(2, "0")}:${String(easternNow.minute).padStart(2, "0")}:${String(easternNow.second).padStart(2, "0")}`
-  );
-  console.log("Next send scheduled for:", nextTime.toISOString());
-  console.log("Delay in ms:", delay);
-
-  nextTimer = setTimeout(async () => {
-    try {
-      await sendDateAlert();
-      console.log("Sent at:", new Date().toISOString());
-    } catch (err) {
-      console.error("SEND ERROR:", err);
-    }
-
+  setTimeout(async () => {
+    await sendDateAlert();
     scheduleNextMessage();
   }, Math.max(delay, 0));
 }
 
 const commands = [
-  new SlashCommandBuilder()
-    .setName("status")
-    .setDescription("Shows bot status and the next scheduled date."),
-  new SlashCommandBuilder()
-    .setName("testping")
-    .setDescription("Sends a test Goos Date ping in the configured channel."),
-  new SlashCommandBuilder()
-    .setName("nextdate")
-    .setDescription("Shows the next scheduled Goos Date time.")
-].map(command => command.toJSON());
+  new SlashCommandBuilder().setName("status").setDescription("Bot status"),
+  new SlashCommandBuilder().setName("testping").setDescription("Test ping"),
+  new SlashCommandBuilder().setName("nextdate").setDescription("Next date")
+].map(cmd => cmd.toJSON());
 
 async function registerCommands() {
   const rest = new REST({ version: "10" }).setToken(TOKEN);
-
-  await rest.put(
-    Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),
-    { body: commands }
-  );
-
-  console.log("Slash commands registered.");
+  await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), { body: commands });
 }
 
 client.once("ready", async () => {
-  console.log("Logged in as:", client.user.tag);
-
-  try {
-    await registerCommands();
-  } catch (err) {
-    console.error("COMMAND REGISTER ERROR:", err);
-  }
-
+  console.log("Logged in");
+  await registerCommands();
   scheduleNextMessage();
 });
 
@@ -226,84 +177,30 @@ client.on("interactionCreate", async interaction => {
   if (!interaction.isChatInputCommand()) return;
 
   if (interaction.commandName === "status") {
-        if (!hasStaffRole(interaction)) {
-      await interaction.reply({
-        content: "Only Staff can use this command.",
-        ephemeral: true
-      });
-      return;
+    if (!hasStaffRole(interaction)) {
+      return interaction.reply({ content: "Staff only command.", ephemeral: true });
     }
-    const nextTime = getNextScheduledTime();
-    const unix = nextTime ? Math.floor(nextTime.getTime() / 1000) : null;
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff2ea6")
-      .setTitle("Bot Status")
-      .addFields(
-        { name: "Status", value: "Online", inline: true },
-        { name: "Channel ID", value: CHANNEL_ID, inline: false },
-        { name: "Role ID", value: ROLE_ID, inline: false },
-        {
-          name: "Next Date",
-          value: unix ? `<t:${unix}:t> (<t:${unix}:R>)` : "Not found",
-          inline: false
-        }
-      );
-
-    await interaction.reply({
-      embeds: [embed],
-      ephemeral: true
-    });
-    return;
+    return interaction.reply({ content: "Bot is online.", ephemeral: true });
   }
 
   if (interaction.commandName === "testping") {
-        if (!hasStaffRole(interaction)) {
-      await interaction.reply({
-        content: "Only Staff can use this command.",
-        ephemeral: true
-      });
-      return;
+    if (!hasStaffRole(interaction)) {
+      return interaction.reply({ content: "Staff only command.", ephemeral: true });
     }
-    try {
-      await sendDateAlert();
-      await interaction.reply({
-        content: "Test ping sent.",
-        ephemeral: true
-      });
-    } catch (err) {
-      console.error("TESTPING ERROR:", err);
-      await interaction.reply({
-        content: "Test ping failed. Check Railway logs.",
-        ephemeral: true
-      });
-    }
-    return;
+
+    await sendDateAlert();
+    return interaction.reply({ content: "Sent.", ephemeral: true });
   }
 
   if (interaction.commandName === "nextdate") {
-    }
-    const nextTime = getNextScheduledTime();
+    const next = getNextScheduledTime();
+    const unix = Math.floor(next.getTime() / 1000);
 
-    if (!nextTime) {
-      await interaction.reply({
-        content: "No next date found.",
-        ephemeral: false
-      });
-      return;
-    }
-
-    const unix = Math.floor(nextTime.getTime() / 1000);
-
-    await interaction.reply({
-      content: `Next Goos Date is <t:${unix}:t> (<t:${unix}:R>)`,
-      ephemeral: false
+    return interaction.reply({
+      content: `<t:${unix}:t> (<t:${unix}:R>)`
     });
-    return;
   }
 });
-
-client.on("error", console.error);
-process.on("unhandledRejection", console.error);
 
 client.login(TOKEN);
